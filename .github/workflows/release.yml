@@ -125,6 +125,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Without @semantic-release/npm, the workflow bumps the version itself,
+      # with the toolchain npm — the same command the manual path runs below.
+      # semantic-release's git plugin then commits package.json and
+      # package-lock.json together with CHANGELOG.md.
+      - name: Bump version (automatic)
+        if: steps.release-mode.outputs.manual_release != 'true' && steps.semantic-dry.outputs.new_release_version != ''
+        run: npm version "${{ steps.semantic-dry.outputs.new_release_version }}" --no-git-tag-version
+
       - name: Run build
         run: npm run build
         env:
@@ -141,6 +149,17 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           # Read by scripts/release/ai-release-notes.mjs
           RELEASE_NOTES_FILE: ${{ runner.temp }}/release-notes.md
+
+      # semantic-release no longer publishes to npm (no @semantic-release/npm
+      # plugin), so publish with the toolchain npm after it has committed and
+      # tagged — mirroring the manual path below. If this step fails, the tag
+      # and GitHub release already exist; re-running this publish for the same
+      # version is the recovery.
+      - name: Publish npm release (automatic)
+        if: steps.release-mode.outputs.manual_release != 'true' && steps.semantic.outputs.new_release_published == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       - name: Publish manual npm release
         if: steps.release-mode.outputs.manual_release == 'true'
