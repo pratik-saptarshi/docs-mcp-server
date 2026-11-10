@@ -175,5 +175,8 @@
       "biome check --write --no-errors-on-unmatched",
       "biome format --write --no-errors-on-unmatched"
     ]
+  },
+  "overrides": {
+    "@semantic-release/npm": "npm:empty-npm-package@1.0.0"
   }
 }
