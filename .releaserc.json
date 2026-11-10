@@ -1,4 +1,5 @@
 {
+  "repositoryUrl": "https://github.com/pratik-saptarshi/docs-mcp-server.git",
   "branches": ["main", "trial/design-a-release"],
   "plugins": [
     "@semantic-release/commit-analyzer",
