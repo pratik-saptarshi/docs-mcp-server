@@ -20,9 +20,10 @@
 
 | Thread ID | Location | Severity | Description | Current Status |
 |---|---|---|---|---|
-| `PRRT_kwDOVeogIc61eoup` | `src/store/embeddings/EmbeddingFactory.ts:60` | P2 | `app.directApi: true` in config file does not enable vector search because `areCredentialsAvailable` only checks `process.env`. | **UNRESOLVED** (Ack'd in PR comments; code not yet modified) |
-| `PRRT_kwDOVeogIc61eour` | `README.md:49` | P2 | Ollama quick start in `README.md` omits `DOCS_MCP_EMBEDDING_MODEL` and `ollama pull` prerequisite, causing failure against default `text-embedding-3-small`. | **UNRESOLVED** (Ack'd in PR comments; code not yet modified) |
-| `PRRT_kwDOVeogIc61eouw` | `src/store/embeddings/EmbeddingFactory.ts:47` | P1 | Exported helper `isOpenAiDirectApiOrProxyConfigured` lacks `@param` and `@returns` TSDoc tags required by AGENTS.md. | **UNRESOLVED** (Ack'd in PR comments; code not yet modified) |
+| `PRRT_kwDOVeogIc61eoup` | `src/store/embeddings/EmbeddingFactory.ts:60` | P2 | `app.directApi: true` in config file does not enable vector search because `areCredentialsAvailable` only checks `process.env`. | **RESOLVED** (`c88e7c6`) |
+| `PRRT_kwDOVeogIc61eour` | `README.md:49` | P2 | Ollama quick start in `README.md` omits `DOCS_MCP_EMBEDDING_MODEL` and `ollama pull` prerequisite, causing failure against default `text-embedding-3-small`. | **RESOLVED** (`c88e7c6`) |
+| `PRRT_kwDOVeogIc61eouw` | `src/store/embeddings/EmbeddingFactory.ts:47` | P1 | Exported helper `isOpenAiDirectApiOrProxyConfigured` lacks `@param` and `@returns` TSDoc tags required by AGENTS.md. | **RESOLVED** (`c88e7c6`) |
+| `PRRT_kwDOVeogIc61gIw_` | `src/utils/config.ts:568` | P2 | Register `--direct-api` option with CLI parser so `docs-mcp-server --direct-api` does not fail strict parsing. | **RESOLVED** (`59849fd`) |
 
 ---
 
