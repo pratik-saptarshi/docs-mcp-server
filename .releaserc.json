@@ -1,5 +1,5 @@
 {
-  "branches": ["main"],
+  "branches": ["main", "trial/design-a-release"],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "./scripts/release/ai-release-notes.mjs",
