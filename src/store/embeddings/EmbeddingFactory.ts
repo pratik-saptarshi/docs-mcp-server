@@ -42,11 +42,16 @@ export class ModelConfigurationError extends Error {
 }
 
 /**
- * Checks whether an OpenAI proxy or direct API is configured in the environment,
+ * Checks whether an OpenAI proxy or direct API is configured in the environment or runtime configuration,
  * allowing requests to be routed without requiring a real OPENAI_API_KEY.
+ *
+ * @param runtimeConfig - Optional configuration object that may specify `directApi`.
+ * @returns `true` if an OpenAI base URL or direct API flag is present in environment variables or configuration; otherwise `false`.
  */
 export function isOpenAiDirectApiOrProxyConfigured(
-  runtimeConfig?: AppConfig["embeddings"] & { directApi?: boolean },
+  runtimeConfig?:
+    | (AppConfig["embeddings"] & { directApi?: boolean })
+    | { directApi?: boolean },
 ): boolean {
   return (
     !!process.env.OPENAI_BASE_URL ||
@@ -66,13 +71,17 @@ export function isOpenAiDirectApiOrProxyConfigured(
  * Returns true if any credentials are found, false if no credentials are provided.
  * Does not validate if the credentials are correct, only if they are present.
  *
- * @param provider The embedding provider to check
+ * @param provider - The embedding provider to check
+ * @param options - Optional configuration options, such as whether a direct API without credentials is configured
  * @returns true if credentials are available, false if no credentials found
  */
-export function areCredentialsAvailable(provider: EmbeddingProvider): boolean {
+export function areCredentialsAvailable(
+  provider: EmbeddingProvider,
+  options?: { directApi?: boolean },
+): boolean {
   switch (provider) {
     case "openai":
-      return !!process.env.OPENAI_API_KEY || isOpenAiDirectApiOrProxyConfigured();
+      return !!process.env.OPENAI_API_KEY || isOpenAiDirectApiOrProxyConfigured(options);
 
     case "vertex":
       return !!process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -124,6 +133,7 @@ export function areCredentialsAvailable(provider: EmbeddingProvider): boolean {
  *
  * @param providerAndModel - The provider and model name in the format "provider:model_name"
  *                          or just "model_name" for OpenAI models.
+ * @param runtime - Optional runtime options including timeouts, dimensions, configuration, and directApi setting.
  * @returns A configured instance of the appropriate Embeddings implementation.
  * @throws {UnsupportedProviderError} Runtime backstop for a supported provider
  *          that has no construction branch. An unrecognized prefix is not an
@@ -135,12 +145,14 @@ export function createEmbeddingModel(
   runtime?: {
     requestTimeoutMs?: number;
     vectorDimension?: number;
-    config?: AppConfig["embeddings"];
+    config?: AppConfig["embeddings"] & { directApi?: boolean };
+    directApi?: boolean;
   },
 ): Embeddings {
   const config = runtime?.config;
   const requestTimeoutMs = runtime?.requestTimeoutMs ?? config?.requestTimeoutMs;
   const vectorDimension = runtime?.vectorDimension ?? config?.vectorDimension;
+  const directApi = runtime?.directApi ?? config?.directApi;
   if (vectorDimension === undefined) {
     throw new ModelConfigurationError(
       "Embedding vector dimension is required; set DOCS_MCP_EMBEDDINGS_VECTOR_DIMENSION or embeddings.vectorDimension in config.",
@@ -154,7 +166,10 @@ export function createEmbeddingModel(
 
   switch (provider) {
     case "openai": {
-      const directApiConfigured = isOpenAiDirectApiOrProxyConfigured(config);
+      const directApiConfigured = isOpenAiDirectApiOrProxyConfigured({
+        ...config,
+        directApi,
+      });
       if (!process.env.OPENAI_API_KEY && !directApiConfigured) {
         throw new MissingCredentialsError("openai", ["OPENAI_API_KEY"]);
       }

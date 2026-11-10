@@ -200,6 +200,11 @@ describe("createEmbeddingModel", () => {
       vi.stubGlobal("process", { env: {} });
       expect(areCredentialsAvailable("openai")).toBe(false);
     });
+
+    test("returns true for OpenAI when directApi option is true without environment variables", () => {
+      vi.stubGlobal("process", { env: {} });
+      expect(areCredentialsAvailable("openai", { directApi: true })).toBe(true);
+    });
   });
 
   describe("direct API and proxy support without API key", () => {
@@ -232,6 +237,15 @@ describe("createEmbeddingModel", () => {
         env: { DOCS_MCP_DIRECT_API: "true" },
       });
       const model = createEmbeddingModel("text-embedding-3-small", runtimeConfig);
+      expect(model).toBeInstanceOf(OpenAIEmbeddings);
+    });
+
+    test("creates OpenAI client with directApi runtime option when OPENAI_API_KEY is missing", () => {
+      vi.stubGlobal("process", { env: {} });
+      const model = createEmbeddingModel("text-embedding-3-small", {
+        ...runtimeConfig,
+        directApi: true,
+      });
       expect(model).toBeInstanceOf(OpenAIEmbeddings);
     });
   });
