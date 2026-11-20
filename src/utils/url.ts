@@ -1,4 +1,4 @@
-import psl from "psl";
+import * as psl from "psl";
 import { InvalidUrlError } from "./errors";
 import { MimeTypeUtils } from "./mimeTypeUtils";
 

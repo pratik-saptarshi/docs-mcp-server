@@ -5,6 +5,13 @@
     "jsxImportSource": "react",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    // psl ships its own types at types/index.d.ts, but its package.json
+    // "exports" map has no "types" condition, so under "bundler" resolution
+    // TypeScript cannot reach them (TS7016). Point it at the file directly.
+    // (@types/psl 1.11.0 is an empty stub and no longer provides them.)
+    "paths": {
+      "psl": ["./node_modules/psl/types/index.d.ts"]
+    },
     "noEmit": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
